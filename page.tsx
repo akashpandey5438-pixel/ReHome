@@ -18,28 +18,30 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 
-const loginFormSchema = z.object({
+const signupFormSchema = z.object({
+  name: z.string().min(3, { message: 'Name must be at least 3 characters.' }),
   email: z.string().email({ message: 'Please enter a valid email address.' }),
-  password: z.string().min(1, { message: 'Password is required.' }),
+  password: z.string().min(8, { message: 'Password must be at least 8 characters.' }),
 });
 
-type LoginFormValues = z.infer<typeof loginFormSchema>;
+type SignupFormValues = z.infer<typeof signupFormSchema>;
 
-export default function LoginPage() {
+export default function SignupPage() {
   const { toast } = useToast();
-  const form = useForm<LoginFormValues>({
-    resolver: zodResolver(loginFormSchema),
+  const form = useForm<SignupFormValues>({
+    resolver: zodResolver(signupFormSchema),
     defaultValues: {
+      name: '',
       email: '',
       password: '',
     },
   });
 
-  function onSubmit(data: LoginFormValues) {
+  function onSubmit(data: SignupFormValues) {
     console.log(data);
     toast({
-      title: 'Logged In!',
-      description: 'Welcome back!',
+      title: 'Account Created!',
+      description: 'Your account has been successfully created.',
     });
     form.reset();
   }
@@ -48,14 +50,27 @@ export default function LoginPage() {
     <div className="container mx-auto flex h-full min-h-[calc(100vh-10rem)] items-center justify-center px-4 py-8 md:px-6 lg:py-12">
       <Card className="max-w-sm w-full">
         <CardHeader>
-          <CardTitle className="text-3xl font-headline">Login</CardTitle>
+          <CardTitle className="text-3xl font-headline">Create an Account</CardTitle>
           <CardDescription>
-            Enter your credentials to access your account.
+            Enter your details below to get started.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+               <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="John Doe" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="email"
@@ -83,14 +98,14 @@ export default function LoginPage() {
                 )}
               />
               <Button type="submit" size="lg" className="w-full">
-                Login
+                Sign Up
               </Button>
             </form>
           </Form>
           <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{' '}
-            <Link href="/signup" className="underline">
-              Sign up
+            Already have an account?{' '}
+            <Link href="/login" className="underline">
+              Login
             </Link>
           </div>
         </CardContent>
